@@ -5,6 +5,23 @@ import (
 	"testing"
 )
 
+// func Teste_EmptyStore(t *testing.T) {
+// 	store := newStore()
+// 	if len(store.data) != 0 {
+// 		t.Errorf("Expected empty store, got %v", store.data)
+// 	}
+// }
+
+func TestGet_limitedStore(t *testing.T) {
+	store := newStore(2)
+	store.Set("KEY1", "hihry")
+	store.Set("KEY2", "hihry2")
+	// Attempt to add a third key should fail
+	_, err := store.Get("KEY3")	
+	if err == nil {
+		t.Errorf("Expected error when getting non-existent key, got nil")
+	}
+}	
 func TestKeys(t *testing.T) {
 	store := newStore()
 	store.Set("KEY1", "hihry")
@@ -23,7 +40,7 @@ func TestKeys(t *testing.T) {
 func TestKeys_EmptyStore(t *testing.T) {
 	store := newStore()
 	keys := store.Keys()
-
+	
 	if len(keys) != 0 {
 		t.Errorf("Expected 0 keys, got %d", len(keys))
 	}
@@ -34,10 +51,10 @@ func TestKeys_EmptyStore(t *testing.T) {
 func TestSetGet_RoundTrip(t *testing.T) {
 	store := newStore()
 	store.Set("hello", "world")
-	if val, ok := store.Get("hello"); !ok || val != "world" {
+	if val, err := store.Get("hello"); err != nil || val != "world" {
 		t.Errorf("Get() failed")
 	}
-	if val, ok := store.Get("nonexistent"); ok || val != "" {
-		t.Errorf("Expected Get('nonexistent') to return ('', false), got ('%s', %v)", val, ok)
+	if val, err := store.Get("nonexistent"); err == nil || val != "" {
+		t.Errorf("Expected Get('nonexistent') to return ('', false), got ('%s', %v)", val, err)
 	}
 }

@@ -1,9 +1,18 @@
 package main
 
-import "sort"
+import (
+	"errors"
+	"sort"
+)
+
+var (
+	ErrorType  = errors.New("key not found")
+	ErrStoreFull = errors.New("store is full")
+)
 
 type Store struct {
-	data map[string]string
+	data    map[string]string
+	maxKeys int
 }
 
 func (s *Store) Keys() []string {
@@ -15,17 +24,31 @@ func (s *Store) Keys() []string {
 	return keys
 }
 
-func (s *Store) Get(key string) (string, bool) {
+func (s *Store) Get(key string) (string, error) {
 	val, ok := s.data[key]
-	return val, ok
+	if !ok {
+		return "", ErrorType
+	}
+	return val, nil
 }
 func (s *Store) Set(key string, val string) (string, bool) {
+	if _, exists := s.data[key]; !exists &&
+		s.maxKeys > 0 && len(s.data) >= s.maxKeys {
+		return "", false
+	}
 	s.data[key] = val
 	return val, true
 }
-func newStore() *Store {
+
+func newStore(maxKeys ...int) *Store {
+	limit := 0
+	if len(maxKeys) > 0 {
+		limit = maxKeys[0]
+	}
+
 	return &Store{
-		data: make(map[string]string),
+		data:    make(map[string]string),
+		maxKeys: limit,
 	}
 }
 

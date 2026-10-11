@@ -1,13 +1,16 @@
 package main
-
-import (
-	"fmt"
-)
+import "fmt"
 
 func main() {
-	store := newStore()
-	store.Set("KEY1", "hihry")
-	val, ok := store.Get("KEY1")
-	fmt.Println("%w , %w", val, ok)
-	fmt.Println("Hello there")
+    store := newStore()
+    store.Set("KEY1", "hihry")
+	store.Delete("KEY1")
+    val, err := store.Get("KEY1")
+
+    if err != nil {
+        fmt.Println("Error:", err)
+    } else {
+        fmt.Println("Value:", val)
+    }
+    fmt.Println("Hello there")
 }
